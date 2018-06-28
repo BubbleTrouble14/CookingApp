@@ -1,0 +1,130 @@
+{
+  "project_info": {
+    "project_number": "1440693109",
+    "firebase_url": "https://cookingapp-bc9c5.firebaseio.com",
+    "project_id": "cookingapp-bc9c5",
+    "storage_bucket": "cookingapp-bc9c5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1440693109:android:2e33bb7f35af9a27",
+        "android_client_info": {
+          "package_name": "com.bubbletrouble.cookingapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1440693109-f4ap9qkl37f2pmftrnmjkive3iaitutd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bubbletrouble.cookingapp",
+            "certificate_hash": "64b69c0dc4778c7a3ef5a0fa35d1d5a059bb0d89"
+          }
+        },
+        {
+          "client_id": "1440693109-8i3kocf9b3u153c0gh38nr67vv6tnsqj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlP40aFyGMBfEnKcm9AZI9IPL5iAkkiVU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1440693109-8i3kocf9b3u153c0gh38nr67vv6tnsqj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1440693109:android:08294967cdb605fd",
+        "android_client_info": {
+          "package_name": "com.bubbletrouble.cookingapp.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1440693109-snba4gr11hj4glfe5aiu1tuj8bo96ep5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bubbletrouble.cookingapp.app",
+            "certificate_hash": "64b69c0dc4778c7a3ef5a0fa35d1d5a059bb0d89"
+          }
+        },
+        {
+          "client_id": "1440693109-8i3kocf9b3u153c0gh38nr67vv6tnsqj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlP40aFyGMBfEnKcm9AZI9IPL5iAkkiVU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1440693109-8i3kocf9b3u153c0gh38nr67vv6tnsqj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1440693109:android:eb3ec0cb89103e47",
+        "android_client_info": {
+          "package_name": "com.bubbletrouble.cookingapp.feature"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1440693109-8i3kocf9b3u153c0gh38nr67vv6tnsqj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlP40aFyGMBfEnKcm9AZI9IPL5iAkkiVU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
