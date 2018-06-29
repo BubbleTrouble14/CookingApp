@@ -8,8 +8,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.bubbletrouble.cookingapp.ProgressDialogBoxBubble;
 import com.bubbletrouble.cookingapp.R;
+import com.bubbletrouble.cookingapp.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -25,45 +26,46 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
-public class ChangePasswordActivity extends AppCompatActivity {
+public class ChangeEmailActivity extends AppCompatActivity {
 
-    private EditText txt_pass_curr, txt_pass_new, txt_pass_newconf;
-    private String pass;
-    private static String TAG = "ChangePasswordActivity";
+    private EditText txt_pass, txt_email;
+    private String email, pass;
+    private static String TAG = "ChangeEmailActivity";
+    private Button btn_email;
     private FirebaseUser user;
     private FirebaseAuth auth;
     private ProgressDialogBoxBubble dialogBoxBubble;
-    private Button btn_pass;
-    private TextInputLayout layout_pass_curr, layout_pass_new, layout_pass_newconf;
+    private TextInputLayout layout_pass, layout_email;
+    private DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_change_password);
+        setContentView(R.layout.activity_change_email);
 
-        txt_pass_curr = findViewById(R.id.txt_change_password_current);
-        txt_pass_new  = findViewById(R.id.txt_change_password_new);
-        txt_pass_newconf = findViewById(R.id.txt_change_password_new_conf);
-        btn_pass = findViewById(R.id.btn_update_pass);
+        txt_pass = findViewById(R.id.txt_change_email_password);
+        txt_email  = findViewById(R.id.txt_change_email);
+        btn_email = findViewById(R.id.btn_update_email);
 
-        layout_pass_curr = findViewById(R.id.layout_change_pass_current);
-        layout_pass_new = findViewById(R.id.layout_change_pass_new);
-        layout_pass_newconf = findViewById(R.id.layout_change_pass_newconf);
+        layout_pass = findViewById(R.id.layout_change_email_pass);
+        layout_email = findViewById(R.id.layout_change_email);
 
         auth = FirebaseAuth.getInstance();
         user = FirebaseAuth.getInstance().getCurrentUser();
         dialogBoxBubble = new ProgressDialogBoxBubble();
 
-        txt_pass_curr.setVisibility(View.VISIBLE);
-        txt_pass_new.setVisibility(View.GONE);
-        txt_pass_newconf.setVisibility(View.GONE);
+        txt_pass.setVisibility(View.VISIBLE);
+        txt_email.setVisibility(View.GONE);
 
-        txt_pass_curr.addTextChangedListener(new MyTextWatcher(txt_pass_curr));
-        txt_pass_new.addTextChangedListener(new MyTextWatcher(txt_pass_new));
-        txt_pass_newconf.addTextChangedListener(new MyTextWatcher(txt_pass_newconf));
+        txt_pass.addTextChangedListener(new MyTextWatcher(txt_pass));
+        txt_email.addTextChangedListener(new MyTextWatcher(txt_email));
 
-        btn_pass.setOnClickListener(new View.OnClickListener() {
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        btn_email.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 update(view);
@@ -76,30 +78,28 @@ public class ChangePasswordActivity extends AppCompatActivity {
     {
         if(user != null)
         {
-            if(txt_pass_curr.getVisibility() == View.VISIBLE)
+            if(txt_pass.getVisibility() == View.VISIBLE)
             {
-                if (!validateCurrPass()) {
+                if (!validatePass()) {
                     return;
                 }
                 dialogBoxBubble.show(getSupportFragmentManager(), "progress_dialog");
-                AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(),txt_pass_curr.getText().toString().trim());
+                AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(),txt_pass.getText().toString().trim());
                 user.reauthenticateAndRetrieveData(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            txt_pass_curr.setVisibility(View.GONE);
-                            txt_pass_new.setVisibility(View.VISIBLE);
-                            txt_pass_newconf.setVisibility(View.VISIBLE);
+                            txt_pass.setVisibility(View.GONE);
+                            txt_email.setVisibility(View.VISIBLE);
 
-                            layout_pass_curr.setVisibility(View.GONE);
-                            layout_pass_new.setVisibility(View.VISIBLE);
-                            layout_pass_newconf.setVisibility(View.VISIBLE);
+                            layout_pass.setVisibility(View.GONE);
+                            layout_email.setVisibility(View.VISIBLE);
 
                             dialogBoxBubble.dismiss();
                         }
                         else
                         {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(ChangePasswordActivity.this);
+                            AlertDialog.Builder builder = new AlertDialog.Builder(ChangeEmailActivity.this);
                             builder.setMessage(task.getException().getMessage())
                                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {}
@@ -111,24 +111,26 @@ public class ChangePasswordActivity extends AppCompatActivity {
                 });
             }
             else {
-                if (!validateNewPass()) {
-                    return;
-                }
-                if (!validateNewPassconf()) {
+                if (!validateEmail()) {
                     return;
                 }
                 dialogBoxBubble.show(getSupportFragmentManager(), "progress_dialog");
-                user.updatePassword(txt_pass_new.getText().toString().trim())
+                user.updateEmail(email)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
-                                    Toast.makeText(ChangePasswordActivity.this, "Successfully updated password", Toast.LENGTH_SHORT).show();
-                                    startActivity(new Intent(ChangePasswordActivity.this, SettingsActivity.class));
+                                    Toast.makeText(ChangeEmailActivity.this, "Successfully updated email", Toast.LENGTH_SHORT).show();
+                                    try {
+                                        writeNewUser(user.getUid(), user.getDisplayName(), email);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    startActivity(new Intent(ChangeEmailActivity.this, SettingsActivity.class));
                                     finish();
                                     dialogBoxBubble.dismiss();
                                 } else {
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(ChangePasswordActivity.this);
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(ChangeEmailActivity.this);
                                     builder.setMessage(task.getException().getMessage())
                                             .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
@@ -143,62 +145,48 @@ public class ChangePasswordActivity extends AppCompatActivity {
         }
     }
 
-    private boolean validateCurrPass() {
-        pass = txt_pass_curr.getText().toString().trim();
+    private void writeNewUser(String userId, String name, String email) {
+        User user = new User(name, email);
+
+        mDatabase.child("users").child(userId).setValue(user);
+    }
+
+    private boolean validatePass() {
+        pass = txt_pass.getText().toString().trim();
 
         if (pass.isEmpty()) {
-            layout_pass_curr.setError(getString(R.string.err_msg_password));
-            requestFocus(txt_pass_curr);
+            layout_pass.setError(getString(R.string.err_msg_password));
+            requestFocus(txt_pass);
             return false;
         }
         else {
-            layout_pass_curr.setErrorEnabled(false);
+            layout_pass.setErrorEnabled(false);
         }
         return true;
     }
 
-    private boolean validateNewPass() {
-        pass = txt_pass_new.getText().toString().trim();
+    private boolean validateEmail() {
+        email = txt_email.getText().toString().trim();
 
-        if (pass.isEmpty()) {
-            txt_pass_new.setError(getString(R.string.err_msg_password));
-            requestFocus(txt_pass_new);
+        if (email.isEmpty() || !isValidEmail(email)) {
+            layout_email.setError(getString(R.string.err_msg_email));
+            requestFocus(txt_email);
             return false;
-        }
-        if(txt_pass_new.getText().toString().trim().length() < 6)
-        {
-            layout_pass_new.setError(getString(R.string.err_msg_password_length));
-            requestFocus(txt_pass_new);
-            return false;
-        }
-        else {
-            layout_pass_new.setErrorEnabled(false);
+        } else {
+            layout_email.setErrorEnabled(false);
         }
         return true;
     }
 
-    private boolean validateNewPassconf() {
-        if (txt_pass_newconf.getText().toString().trim().isEmpty()) {
-            txt_pass_newconf.setError(getString(R.string.err_msg_password));
-            requestFocus(txt_pass_newconf);
-            return false;
-        }
-        if(!txt_pass_newconf.getText().toString().trim().equals(txt_pass_new.getText().toString().trim()))
-        {
-            layout_pass_newconf.setError(getString(R.string.err_msg_passwconf));
-            requestFocus(txt_pass_newconf);
-            return false;
-        }
-        else {
-            layout_pass_newconf.setErrorEnabled(false);
-        }
-        return true;
-    }
 
     private void requestFocus(View view) {
         if (view.requestFocus()) {
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         }
+    }
+
+    private static boolean isValidEmail(String email) {
+        return !TextUtils.isEmpty(email) && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
     private class MyTextWatcher implements TextWatcher {
@@ -217,14 +205,11 @@ public class ChangePasswordActivity extends AppCompatActivity {
 
         public void afterTextChanged(Editable editable) {
             switch (view.getId()) {
-                case R.id.txt_signup_username:
-                    validateCurrPass();
+                case R.id.txt_change_email_password:
+                    validatePass();
                     break;
-                case R.id.txt_signup_email:
-                    validateNewPass();
-                    break;
-                case R.id.txt_signup_pass:
-                    validateNewPassconf();
+                case R.id.txt_change_email:
+                    validateEmail();
                     break;
             }
         }

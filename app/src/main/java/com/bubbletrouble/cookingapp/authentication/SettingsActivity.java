@@ -22,7 +22,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     public void onChangeEmailClicked(View v)
     {
-
+        startActivity(new Intent(SettingsActivity.this, ChangeEmailActivity.class));
     }
 
     public void onDeleteAccountClicked(View v)

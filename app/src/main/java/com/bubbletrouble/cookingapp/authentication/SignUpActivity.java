@@ -121,7 +121,11 @@ public class SignUpActivity extends AppCompatActivity {
                                     if (task.isSuccessful())
                                     {
                                         dialogBoxBubble.dismiss();
-                                        writeNewUser(user.getUid(), txt_username.getText().toString().trim(), user.getEmail());
+                                        try {
+                                            writeNewUser(user.getUid(), txt_username.getText().toString().trim(), user.getEmail());
+                                        } catch (Exception e) {
+                                            Toast.makeText(SignUpActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();;
+                                        }
                                         startActivity(new Intent(SignUpActivity.this, MainActivity.class));
                                     }
                                     else
