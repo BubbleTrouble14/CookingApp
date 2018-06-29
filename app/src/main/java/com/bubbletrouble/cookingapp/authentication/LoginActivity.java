@@ -25,7 +25,6 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private EditText txt_email, txt_pass;
     private TextView txtV_sigup;
-    private Button btn_login;
     private String email, pass;
     private ProgressDialogBoxBubble dialogBoxBubble;
     private static String TAG = "LoginActivity";
@@ -45,7 +44,6 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
             }
         });
-        btn_login = findViewById(R.id.btn_login);
         dialogBoxBubble = new ProgressDialogBoxBubble();
     }
 

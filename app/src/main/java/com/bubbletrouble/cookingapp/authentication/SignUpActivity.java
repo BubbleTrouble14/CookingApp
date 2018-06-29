@@ -28,7 +28,6 @@ public class SignUpActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private EditText txt_username, txt_email, txt_pass, txt_passconf;
     private String username, email, pass, passconf;
-    private Button btn_signup;
     private ProgressDialogBoxBubble dialogBoxBubble;
     private static String TAG = "SignUpActivity";
 
@@ -43,7 +42,6 @@ public class SignUpActivity extends AppCompatActivity {
         txt_email = findViewById(R.id.txt_signup_email);
         txt_pass = findViewById(R.id.txt_signup_pass);
         txt_passconf = findViewById(R.id.txt_signup_passconf);
-        btn_signup = findViewById(R.id.btn_signup);
         dialogBoxBubble = new ProgressDialogBoxBubble();
     }
 
