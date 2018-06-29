@@ -17,4 +17,8 @@
     <string name="err_msg_password">Enter the password</string>
     <string name="err_msg_passwconf">Please make sure you Entered the same password</string>
     <string name="err_msg_password_length">Password must have a Minimum of 6 Characters</string>
+    <string name="change_email">Change email</string>
+    <string name="change_pass">Change password</string>
+    <string name="delete_acc">Delete account</string>
+    <string name="sign_out">Sign out</string>
 </resources>

@@ -1,8 +1,10 @@
 package com.bubbletrouble.cookingapp.authentication;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -19,11 +21,15 @@ import android.widget.Toast;
 import com.bubbletrouble.cookingapp.MainActivity;
 import com.bubbletrouble.cookingapp.ProgressDialogBoxBubble;
 import com.bubbletrouble.cookingapp.R;
+import com.bubbletrouble.cookingapp.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,6 +37,7 @@ import java.util.regex.Pattern;
 public class SignUpActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
+    private DatabaseReference mDatabase;
     private EditText txt_username, txt_email, txt_pass, txt_passconf;
     private String email, pass;
     private TextInputLayout layout_username, layout_email, layout_pass, layout_passconf;
@@ -41,9 +48,9 @@ public class SignUpActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         setContentView(R.layout.activity_sign_up);
-
 
         txt_username = findViewById(R.id.txt_signup_username);
         txt_email = findViewById(R.id.txt_signup_email);
@@ -91,37 +98,11 @@ public class SignUpActivity extends AppCompatActivity {
       //TODO  updateUI(currentUser);
     }
 
-//    private void init()
-//    {
-//        username = txt_username.getText().toString().trim();
-//        email = txt_email.getText().toString().trim();
-//        pass = txt_pass.getText().toString().trim();
-//        passconf = txt_passconf.getText().toString().trim();
-//    }
-//
-//    private boolean validate() {
-//        boolean valid = true;
-//        if (username.isEmpty()) {
-//            layout_username.setError("Please Enter a valid Username");
-//            valid = false;
-//        }
-//        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-//            layout_email.setError("Please Enter a valid Email");
-//            valid = false;
-//        }
-//        if (pass.isEmpty()) {
-//            layout_pass.setError("Please Enter a valid Password");
-//            valid = false;
-//        }
-//        if (pass.length() < 6) {
-//            layout_pass.setError("The Password must at least have 6 Characters");
-//        }
-//        if (passconf.isEmpty() || !passconf.equals(pass)) {
-//            layout_passconf.setError("Make sure you typed in the same Password");
-//            valid = false;
-//        }
-//        return valid;
-//    }
+    private void writeNewUser(String userId, String name, String email) {
+        User user = new User(name, email);
+
+        mDatabase.child("users").child(userId).setValue(user);
+    }
 
     private void createFirebaseAcc()
     {
@@ -130,21 +111,44 @@ public class SignUpActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            dialogBoxBubble.dismiss();
-                            // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            startActivity(new Intent(SignUpActivity.this, MainActivity.class));
+                            final FirebaseUser user = mAuth.getCurrentUser();
+                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                    .setDisplayName(txt_username.getText().toString().trim()).build();
+                            user.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful())
+                                    {
+                                        dialogBoxBubble.dismiss();
+                                        writeNewUser(user.getUid(), txt_username.getText().toString().trim(), user.getEmail());
+                                        startActivity(new Intent(SignUpActivity.this, MainActivity.class));
+                                    }
+                                    else
+                                    {
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(SignUpActivity.this);
+                                        builder.setMessage(task.getException().getMessage())
+                                                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {}
+                                                });
+                                        builder.create().show();
+                                        dialogBoxBubble.dismiss();
+                                    }
+                                }
+                            });
+
                            //TODO updateUI(user);
                         } else {
                             dialogBoxBubble.dismiss();
-                            // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(SignUpActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            AlertDialog.Builder builder = new AlertDialog.Builder(SignUpActivity.this);
+                            builder.setMessage(task.getException().getMessage())
+                                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {}
+                                    });
+                            builder.create().show();
                             //TODO updateUI(null);
                         }
-                        // ...
                     }
                 });
     }
@@ -166,7 +170,6 @@ public class SignUpActivity extends AppCompatActivity {
         }
         dialogBoxBubble.show(getSupportFragmentManager(), "progress_dialog");
         createFirebaseAcc();
-        Toast.makeText(getApplicationContext(), "Thank You!", Toast.LENGTH_SHORT).show();
     }
 
     private boolean validateName() {
