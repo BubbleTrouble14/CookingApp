@@ -1,11 +1,16 @@
 package com.bubbletrouble.cookingapp.authentication;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -26,6 +31,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText txt_email, txt_pass;
     private TextView txtV_sigup;
     private String email, pass;
+    private TextInputLayout layout_email, layout_pass;
     private ProgressDialogBoxBubble dialogBoxBubble;
     private static String TAG = "LoginActivity";
 
@@ -44,26 +50,18 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
             }
         });
+        layout_email = findViewById(R.id.layout_login_email);
+        layout_pass = findViewById(R.id.layout_login_pass);
         dialogBoxBubble = new ProgressDialogBoxBubble();
     }
 
 
     public void onLoginClicked(View v)
     {
-        dialogBoxBubble.show(getSupportFragmentManager(), "progress_dialog");
-        init();
-        if(!validate())
-        {
-            dialogBoxBubble.dismiss();
-            Toast.makeText(this, "Error with credentials", Toast.LENGTH_SHORT).show();
-        }
-        else
-        {
-            login();
-        }
+        submitForm();
     }
 
-    private void login()
+    private void loginFirebaseAcc()
     {
         mAuth.signInWithEmailAndPassword(email, pass)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -79,10 +77,17 @@ public class LoginActivity extends AppCompatActivity {
                        //     updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
-                            dialogBoxBubble.dismiss();
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                            builder.setMessage(task.getException().getMessage())
+                                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            // FIRE ZE MISSILES!
+                                        }
+                                    });
+                            builder.create().show();
+                            dialogBoxBubble.dismiss();
+                            //TODO
                        //     updateUI(null);
                         }
 
@@ -91,29 +96,47 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    private void init()
-    {
-        email = txt_email.getText().toString().trim();
-        pass = txt_pass.getText().toString().trim();
+    private void submitForm() {
+        if (!validateEmail()) {
+            return;
+        }
+        if (!validatePass()) {
+            return;
+        }
+        dialogBoxBubble.show(getSupportFragmentManager(), "progress_dialog");
+        loginFirebaseAcc();
     }
 
-    private boolean validate()
-    {
-        boolean valid = true;
-        if(email.isEmpty())
-        {
-            txt_email.setError("Please Enter a valid Email");
-            valid = false;
+    private boolean validatePass() {
+        pass = txt_pass.getText().toString().trim();
+
+        if (pass.isEmpty()) {
+            layout_pass.setError(getString(R.string.err_msg_password));
+            requestFocus(txt_pass);
+            return false;
         }
-        if(pass.isEmpty())
-        {
-            txt_pass.setError("Please Enter a valid Password");
-            valid = false;
+        else {
+            layout_pass.setErrorEnabled(false);
         }
-        if(pass.length() < 6)
-        {
-            txt_pass.setError("The Password must at least have 6 Characters");
+        return true;
+    }
+
+    private boolean validateEmail() {
+        email = txt_email.getText().toString().trim();
+
+        if (email.isEmpty()) {
+            layout_email.setError(getString(R.string.err_msg_email));
+            requestFocus(txt_email);
+            return false;
+        } else {
+            layout_email.setErrorEnabled(false);
         }
-        return valid;
+        return true;
+    }
+
+    private void requestFocus(View view) {
+        if (view.requestFocus()) {
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        }
     }
 }

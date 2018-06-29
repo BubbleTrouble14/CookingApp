@@ -12,4 +12,9 @@
     <string name="passconf">Confirm Password</string>
     <string name="signup">Sign up</string>
     <string name="login_name">Login</string>
+    <string name="err_msg_name">Enter your full name</string>
+    <string name="err_msg_email">Enter valid email address</string>
+    <string name="err_msg_password">Enter the password</string>
+    <string name="err_msg_passwconf">Please make sure you Entered the same password</string>
+    <string name="err_msg_password_length">Password must have a Minimum of 6 Characters</string>
 </resources>

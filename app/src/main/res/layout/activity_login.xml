@@ -6,54 +6,62 @@
     android:layout_height="match_parent"
     tools:context=".authentication.LoginActivity">
 
-    <Button
-        android:id="@+id/btn_login"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="32dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="64dp"
-        android:onClick="onLoginClicked"
-        android:text="@string/login_name"
-        app:layout_constraintEnd_toEndOf="@+id/txt_login_pass"
-        app:layout_constraintStart_toStartOf="@+id/txt_login_pass"
-        app:layout_constraintTop_toBottomOf="@+id/txt_login_pass" />
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="20dp">
 
-    <EditText
-        android:id="@+id/txt_login_pass"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="@string/pass"
-        android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="@+id/txt_login_email"
-        app:layout_constraintStart_toStartOf="@+id/txt_login_email"
-        app:layout_constraintTop_toBottomOf="@+id/txt_login_email" />
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/layout_login_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/email">
 
-    <EditText
-        android:id="@+id/txt_login_email"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="32dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="64dp"
-        android:ems="10"
-        android:hint="@string/email"
-        android:inputType="textEmailAddress"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            <EditText
+                android:id="@+id/txt_login_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress" />
 
-    <TextView
-        android:id="@+id/txtV_login_creatacc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
-        android:text="No account yet? Create one!"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_login" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/layout_login_pass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/pass">
+
+            <EditText
+                android:id="@+id/txt_login_pass"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="40dp"
+            android:onClick="onLoginClicked"
+            android:text="@string/login_name" />
+
+        <TextView
+            android:id="@+id/txtV_login_creatacc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="32dp"
+            android:text="No account yet? Create one!"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_login" />
+
+    </LinearLayout>
 </android.support.constraint.ConstraintLayout>
