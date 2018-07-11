@@ -23,7 +23,8 @@
         <activity android:name=".authentication.LoginActivity" />
         <activity android:name=".authentication.SettingsActivity" />
         <activity android:name=".authentication.ChangePasswordActivity" />
-        <activity android:name=".authentication.ChangeEmailActivity"></activity>
+        <activity android:name=".authentication.ChangeEmailActivity" />
+        <activity android:name=".authentication.DeleteUserActivity"></activity>
     </application>
 
 </manifest>

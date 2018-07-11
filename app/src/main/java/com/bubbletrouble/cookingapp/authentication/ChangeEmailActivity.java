@@ -126,7 +126,7 @@ public class ChangeEmailActivity extends AppCompatActivity {
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
-                                    startActivity(new Intent(ChangeEmailActivity.this, SettingsActivity.class));
+                                   // startActivity(new Intent(ChangeEmailActivity.this, SettingsActivity.class));
                                     finish();
                                     dialogBoxBubble.dismiss();
                                 } else {

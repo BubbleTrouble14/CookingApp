@@ -47,10 +47,11 @@ public class SignUpActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_sign_up);
+
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        setContentView(R.layout.activity_sign_up);
 
         txt_username = findViewById(R.id.txt_signup_username);
         txt_email = findViewById(R.id.txt_signup_email);

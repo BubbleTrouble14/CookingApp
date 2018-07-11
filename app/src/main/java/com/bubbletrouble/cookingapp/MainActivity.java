@@ -3,9 +3,8 @@ package com.bubbletrouble.cookingapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.LayoutInflater;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -16,20 +15,42 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bubbletrouble.cookingapp.adapter.GroupAdapter;
 import com.bubbletrouble.cookingapp.authentication.LoginActivity;
 import com.bubbletrouble.cookingapp.authentication.SettingsActivity;
-import com.bubbletrouble.cookingapp.authentication.SignUpActivity;
+import com.bubbletrouble.cookingapp.model.FoodCategory;
+import com.bubbletrouble.cookingapp.model.Group;
+import com.bubbletrouble.cookingapp.model.Meal;
+import com.bubbletrouble.cookingapp.model.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, RecyclerViewClickListener{
 
     private FirebaseAuth.AuthStateListener authListener;
     private FirebaseAuth auth;
     private TextView navHeaderName, navHeaderEmail;
     private NavigationView navigationView;
+    private DatabaseReference mDatabase;
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter mAdapter;
+    List<Group> groups = new ArrayList<>();
+    List<User> users = new ArrayList<>();
+    List<FoodCategory>foodCategories = new ArrayList<>();
+    List<Meal>meals= new ArrayList<>();
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +59,25 @@ public class MainActivity extends AppCompatActivity
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        recyclerView=findViewById(R.id.rv_main);
+        recyclerView.setHasFixedSize(true);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
+
+        meals.add(new Meal());
+        meals.add(new Meal());
+        users.add(new User("ronald", "ronald.goedeke@outlook.com"));
+        users.add(new User("mario", "mario.emberger@outlook.com"));
+        groups.add(new Group(users, foodCategories));
+        groups.add(new Group(users, foodCategories));
+
+        mAdapter = new GroupAdapter(groups, this);
+        recyclerView.setAdapter(mAdapter);
+
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         //get current user
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -72,6 +110,42 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         };
+
+        mDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                //Fetch values from you database child and set it to the specific view object.
+                if(auth.getCurrentUser() != null) {
+                    if(dataSnapshot.child("users").child(auth.getCurrentUser().getUid()).child("username").getValue() != null)
+                    {
+                        navHeaderName.setText(dataSnapshot.child("users").child(auth.getCurrentUser().getUid()).child("username").getValue().toString());
+                    }else
+                        navHeaderName.setText(null);
+                    if(dataSnapshot.child("users").child(auth.getCurrentUser().getUid()).child("email").getValue() != null) {
+                        navHeaderEmail.setText(dataSnapshot.child("users").child(auth.getCurrentUser().getUid()).child("email").getValue().toString());
+                    }
+                    else
+                        navHeaderEmail.setText(null);
+                }
+                else
+                {
+                    navHeaderName.setText(null);
+                    navHeaderEmail.setText(null);
+                }
+
+
+                //  String link =dataSnapshot.child("profile_picture").getValue().toString();
+              //  Picasso.with(getBaseContext()).load(link).into(mImageView);
+            }
+
+            //SIMPLE BRO. HAVE FUN IN ANDROID <3 GOOD LUCK
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(MainActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -96,6 +170,8 @@ public class MainActivity extends AppCompatActivity
 
         return true;
     }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -126,13 +202,11 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_manage) {
 
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        } else if (id == R.id.nav_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -141,5 +215,10 @@ public class MainActivity extends AppCompatActivity
     {
         Intent i = new Intent(this, SettingsActivity.class);
         startActivity(i);
+    }
+
+    @Override
+    public void recyclerViewListClicked(View v, int position) {
+        Toast.makeText(this, position + "", Toast.LENGTH_SHORT).show();
     }
 }

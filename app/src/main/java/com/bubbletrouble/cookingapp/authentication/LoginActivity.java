@@ -3,6 +3,7 @@ package com.bubbletrouble.cookingapp.authentication;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
@@ -53,8 +54,16 @@ public class LoginActivity extends AppCompatActivity {
         layout_email = findViewById(R.id.layout_login_email);
         layout_pass = findViewById(R.id.layout_login_pass);
         dialogBoxBubble = new ProgressDialogBoxBubble();
+
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+       // updateUI(currentUser);
+    }
 
     public void onLoginClicked(View v)
     {
@@ -74,7 +83,7 @@ public class LoginActivity extends AppCompatActivity {
                             FirebaseUser user = mAuth.getCurrentUser();
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             finish();
-                       //     updateUI(user);
+                            //updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
@@ -88,12 +97,22 @@ public class LoginActivity extends AppCompatActivity {
                             builder.create().show();
                             dialogBoxBubble.dismiss();
                             //TODO
-                       //     updateUI(null);
+                            //updateUI(null);
                         }
 
                         // ...
                     }
                 });
+    }
+
+    private void updateUI(FirebaseUser user) {
+//        if (user != null) {
+//            navHeaderName.setText(user.getDisplayName());
+//            navHeaderEmail.setText(user.getEmail());
+//        } else {
+//            navHeaderName.setText(null);
+//            navHeaderEmail.setText(null);
+//        }
     }
 
     private void submitForm() {
